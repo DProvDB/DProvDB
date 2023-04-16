@@ -1,0 +1,321 @@
+---
+databases:
+- database: "adult"
+  dialect: "POSTGRESQL"
+  namespace: "public"
+  tables:
+    - table: "adult"
+      columns:
+        - name: "age"
+          type: "c"
+          ub: 140
+          lb: 1
+        - name: "workclass"
+          type: "d"
+          domain: "Federal-gov,  Private,  Without-pay,  Local-gov,  Never-worked,  Self-emp-not-inc,  Self-emp-inc,  State-gov"
+        - name: "fnlwqt"
+          type: "c"
+          ub: 1500000
+          lb: 10000
+        - name: "education"
+          type: "d"
+          domain: "Prof-school,  Doctorate,  Bachelors,  Preschool,  12th,  Masters,  11th,  9th,  7th-8th,  Some-college,  10th,  Assoc-voc,  Assoc-acdm,  5th-6th,  HS-grad,  1st-4th"
+        - name: "education_num"
+          type: "c"
+          ub: 16
+          lb: 0
+        - name: "marital_status"
+          type: "d"
+          domain: "Separated,  Married-civ-spouse,  Married-AF-spouse,  Married-spouse-absent,  Never-married,  Widowed,  Divorced"
+        - name: "occupation"
+          type: "d"
+          domain: "Tech-support,  Exec-managerial,  Machine-op-inspct,  Prof-specialty,  Priv-house-serv,  Sales, Transport-moving,  Armed-Forces,  Adm-clerical,  Other-service,  Protective-serv,  Craft-repair,  Handlers-cleaners,  Farming-fishing"
+        - name: "relationship"
+          type: "d"
+          domain: "Husband,  Not-in-family,  Other-relative,  Own-child,  Unmarried,  Wife"
+        - name: "race"
+          type: "d"
+          domain: "Other,  Amer-Indian-Eskimo,  White,  Black,  Asian-Pac-Islander"
+        - name: "sex"
+          type: "d"
+          domain: "Female,  Male"
+        - name: "capital_gain"
+          type: "c"
+          ub: 100000
+          lb: 0
+        - name: "capital_loss"
+          type: "c"
+          ub: 5000
+          lb: 0
+        - name: "hours_per_week"
+          type: "c"
+          ub: 100
+          lb: 0
+        - name: "native_country"
+          type: "d"
+          domain: "Germany,  Scotland,  Thailand,  Outlying-US(Guam-USVI-etc),  France,  Guatemala,  Portugal,  Greece,  Puerto-Rico,  Poland,  Cambodia,  Haiti,  Laos,  England,  Cuba,  Italy,  El-Salvador,  Jamaica,  Ireland,  Nicaragua,  Mexico,  Ecuador,  Peru,  Dominican-Republic,  South,  Iran,  Trinadad&Tobago, Holand-Netherlands,  Hungary,  Yugoslavia,  Canada,  Honduras,  Philippines,  United-States,  Hong,  Vietnam,  Taiwan,  Columbia,  China,  India,  Japan"
+        - name: "salary"
+          type: "d"
+          domain: ">50K,  >50K.,  <=50K.,  <=50K"
+- database: "tpch"
+  dialect: "POSTGRESQL"
+  namespace: "public"
+  tables:
+    - table: "orders"
+      columns:
+        - name: "o_orderkey"
+          type: "c"
+          ub: 6000000
+          lb: 0
+        - name: "o_custkey"
+          type: "c"
+          ub: 150000
+          lb: 0
+        - name: "o_orderstatus"
+          type: "d"
+          domain: "F, O, P"
+        - name: "o_totalprice"
+          type: "c"
+          ub: 600000
+          lb: 500
+        - name: "o_orderdate"
+          type: "x"
+        - name: "o_orderpriority"
+          type: "d"
+          domain: "1-URGENT, 2-HIGH, 3-MEDIUM, 4-NOT SPECIFIED, 5-LOW"
+        - name: "o_clerk"
+          type: "x"
+        - name: "o_shippriority"
+          type: "x"
+        - name: "o_comment"
+          type: "x"
+    - table: "lineitem"
+      columns:
+        - name: "l_orderkey"
+          type: "c"
+          ub: 6000000
+          lb: 0
+        - name: "l_partkey"
+          type: "c"
+          ub: 200000
+          lb: 0
+        - name: "l_suppkey"
+          type: "c"
+          ub: 10000
+          lb: 0
+        - name: "l_linenumber"
+          type: "d"
+          domain: "1, 2, 3, 4, 5, 6, 7"
+        - name: "l_quantity"
+          type: "c"
+          ub: 50
+          lb: 0
+        - name: "l_extendedprice"
+          type: "c"
+          ub: 105000
+          lb: 900
+        - name: "l_discount"
+          type: "c"
+          ub: 0.1
+          lb: 0
+        - name: "l_tax"
+          type: "c"
+          ub: 0.1
+          lb: 0
+        - name: "l_returnflag"
+          type: "d"
+          domain: "A, N, R"
+        - name: "l_linestatus"
+          type: "d"
+          domain: "F, O"
+        - name: "l_shipdate"
+          type: "x"
+        - name: "l_commitdate"
+          type: "x"
+        - name: "l_receiptdate"
+          type: "x"
+        - name: "l_shipinstruct"
+          type: "d"
+          domain: "COLLECT COD, DELIVER IN PERSON, NONE, TAKE BACK RETURN"
+        - name: "l_shipmode"
+          type: "d"
+          domain: "AIR, FOB, MAIL, RAIL, REG AIR, SHIP, TRUCK"
+        - name: "l_comment"
+          type: "x"
+    - table: "customer"
+      columns:
+        - name: "c_custkey"
+          type: "c"
+          ub: 150000
+          lb: 0
+        - name: "c_name"
+          type: "x"
+        - name: "c_address"
+          type: "x"
+        - name: "c_nationkey"
+          type: "c"
+          ub: 25
+          lb: 0
+        - name: "c_phone"
+          type: "x"
+        - name: "c_acctbal"
+          type: "c"
+          ub: 10000
+          lb: -1000
+        - name: "c_mktsegment"
+          type: "d"
+          domain: "AUTOMOBILE, BUILDING, FURNITURE, HOUSEHOLD, MACHINERY"
+        - name: "c_comment"
+          type: "x"
+    - table: "nation"
+      columns:
+        - name: "n_nationkey"
+          type: "c"
+          ub: 25
+          lb: 0
+        - name: "n_name"
+          type: "d"
+          domain: "ETHIOPIA, IRAN, EGYPT, RUSSIA, SAUDI ARABIA, INDONESIA, VIETNAM, GERMANY, PERU, FRANCE, ALGERIA, ROMANIA, JORDAN, ARGENTINA, MOROCCO, CANADA, JAPAN, INDIA, UNITED KINGDOM, UNITED STATES, MOZAMBIQUE, CHINA, BRAZIL, KENYA, IRAQ"
+        - name: "n_regionkey"
+          type: "d"
+          domain: "0, 1, 2, 3, 4"
+        - name: "n_comment"
+          type: "x"
+    - table: "region"
+      columns:
+        - name: "r_regionkey"
+          type: "d"
+          domain: "0, 1, 2, 3, 4"
+        - name: "r_name"
+          type: "x"
+        - name: "r_comment"
+          type: "x"
+    - table: "part"
+      columns:
+        - name: "p_partkey"
+          type: "c"
+          ub: 200000
+          lb: 0
+        - name: "p_name"
+          type: "x"
+        - name: "p_mfgr"
+          type: "x"
+        - name: "p_brand"
+          type: "d"
+          domain: "Brand#11, Brand#12, Brand#13, Brand#14, Brand#15, Brand#21, Brand#22, Brand#23, Brand#24, Brand#25, Brand#31, Brand#32, Brand#33, Brand#34, Brand#35, Brand#41, Brand#42, Brand#43, Brand#44, Brand#45, Brand#51, Brand#52, Brand#53, Brand#54, Brand#55"
+        - name: "p_type"
+          type: "x"
+        - name: "p_size"
+          type: "c"
+          ub: 50
+          lb: 0
+        - name: "p_container"
+          type: "d"
+          domain: "JUMBO BAG, JUMBO BOX, JUMBO CAN, JUMBO CASE, JUMBO DRUM, JUMBO JAR, JUMBO PACK, JUMBO PKG, LG BAG, LG BOX, LG CAN, LG CASE, LG DRUM, LG JAR, LG PACK, LG PKG, MED BAG, MED BOX, MED CAN, MED CASE, MED DRUM, MED JAR, MED PACK, MED PKG, SM BAG, SM BOX, SM CAN, SM CASE, SM DRUM, SM JAR, SM PACK, SM PKG, WRAP BAG, WRAP BOX, WRAP CAN, WRAP CASE, WRAP DRUM, WRAP JAR, WRAP PACK, WRAP PKG"
+        - name: "p_retailprice"
+          type: "c"
+          ub: 2100
+          lb: 900
+        - name: "p_comment"
+          type: "x"
+    - table: "supplier"
+      columns:
+        - name: "s_suppkey"
+          type: "c"
+          ub: 10000
+          lb: 0
+        - name: "s_name"
+          type: "x"
+        - name: "s_address"
+          type: "x"
+        - name: "s_nationkey"
+          type: "c"
+          ub: 25
+          lb: 0
+        - name: "s_phone"
+          type: "x"
+        - name: "s_acctbal"
+          type: "c"
+          ub: 10000
+          lb: -1000
+        - name: "s_comment"
+          type: "x"
+    - table: "partsupp"
+      columns:
+        - name: "ps_partkey"
+          type: "c"
+          ub: 200000
+          lb: 0
+        - name: "ps_suppkey"
+          type: "c"
+          ub: 10000
+          lb: 0
+        - name: "ps_availqty"
+          type: "c"
+          ub: 10000
+          lb: 0
+        - name: "ps_supplycost"
+          type: "c"
+          ub: 1000
+          lb: 0
+        - name: "ps_comment"
+          type: "x"
+
+- database: "test"
+  dialect: "hive"
+  namespace: "public"
+  tables:
+  - table: "orders"
+    approxRowCount: 1000000
+    columns:
+    - name: "order_id"
+      maxFreq: 1
+    - name: "order_date"
+      canRelease: true
+    - name: "customer_id"
+      maxFreq: 100
+    - name: "product_id"
+      maxFreq: 500
+      canRelease: true
+      domainSet: "products.product_id"
+    - name: "quantity"
+    - name: "order_cost"
+  - table: "products"
+    isPublic: true
+    columns:
+    - name: "product_id"
+      maxFreq: 300
+    - name: "name"
+    - name: "price"
+  - table: "customers"
+    columns:
+    - name: "customer_id"
+      maxFreq: 1
+    - name: "name"
+      isTainted: true
+    - name: "address"
+      isTainted: true
+      maxFreq: 5
+  - table: "recommendations"
+    columns:
+    - name: "customer_id"
+      maxFreq: 250
+    - name: "product_id"
+      maxFreq: 2000
+
+- database: "test2"
+  dialect: "hive"
+  namespace: ""
+  tables:
+  - table: "my_table"
+    columns:
+    - name: "my_col"
+    - name: "structured_col"
+      fields:
+      - name: "field1"
+      - name: "field2"
+        fields:
+        - name: "subfield1"
+  - table: "subschema.tbl"
+    columns:
+    - name: "col"
