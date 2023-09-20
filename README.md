@@ -1,6 +1,25 @@
+[![arXiv](https://img.shields.io/badge/arXiv-2309.10240-b31b1b.svg)](https://arxiv.org/abs/2309.10240)  [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![conference](https://img.shields.io/badge/SIGMOD--2024-Accepted-success)](https://2024.sigmod.org/index.shtml)
+
 # DProvDB
 
-Main repository for "DProvDB: Differentially Private Query Processing with Multi-Analyst Provenance" (in submission to SIGMOD 2024)
+<p align="center">
+<img src="https://github.com/DProvDB/DProvDB/assets/28619915/7b577462-141e-4613-9210-84d9bc1524f2" width=150 height=150>
+</p>
+
+
+
+Main repository for "DProvDB: Differentially Private Query Processing with Multi-Analyst Provenance", accepted to appear in Proc. of the ACM on Management of Data (PACMMOD/SIGMOD'2024) [[bibtex](#citation)] [[tech report](https://arxiv.org/abs/2309.10240)]
+
+
+## Brief Intro
+
+DProvDB projects aims to build an online DP query processing system where multiple data analysts (with different trust levels) are involved -- these data analysts are not allowed to collude by law or regulations but have the incentive to collude (for a more accurate query answer). We would like to develop DP algorithms that can minimize the privacy loss when the analysts are compromised and build a system &ndash; DProvDB &ndash; to maximize the total number of queries that can be answered given a fixed privacy budget.
+
+This repository contains the implementation of the DProvDB system.
+
+<p align="center">
+<img src="https://github.com/DProvDB/DProvDB/assets/28619915/53c0a66c-333d-4cfc-a17a-2d376e3d36b9" width=800>
+</p>
 
 ## Repository Structure
 
@@ -94,3 +113,27 @@ We enable 4 arguments:
 - [args2]: task, must be "RRQ" or "EQW";
 - [args3]: table, e.g., "adult", or "orders";
 - [args4]: 5 letters to decide which experiment(s) to run, "T" for run, "F" for not run. e.g., "TFTFT" meaning running all experiments except the 2nd and the 4th.
+
+
+## <a name="citation"></a>How to cite: 
+
+> ```
+> @inproceedings{zhang2024dprovdb,
+>   author={Zhang, Shufan and He, Xi},
+>   title={DProvDB: Differentially Private Query Processing with Multi-Analyst Provenance}, 
+>   journal={Proceedings of the ACM on Management of Data (SIGMOD'2024)},
+>   url={https://arxiv.org/abs/2309.10240},
+>   note={to appear}
+>}
+> ```
+
+## Correspondence
+
+[:mailbox_with_mail: Shufan Zhang](mailto:shufan.zhang@uwaterloo.ca) [:scroll: Homepage](https://cs.uwaterloo.ca/~s693zhan/) <br>
+[:mailbox_with_mail: Xi He](mailto:xihe@uwaterloo.ca) [:scroll: Homepage](https://cs.uwaterloo.ca/~xihe/) <br>
+
+
+## License
+
+[BSD-3-Clause License](https://choosealicense.com/licenses/bsd-3-clause/)
+
