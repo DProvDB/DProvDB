@@ -86,10 +86,10 @@ object Experiment extends App {
 
       val schedulers = List("round-robin", "random")
 
-      val mechanisms = List("aGM", "baseline", "PrivateSQL")
+      val mechanisms = List("aGM", "baseline", "PrivateSQL", "Chorus", "ChorusP")
       val workloadSize = 4000
       val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
-        ProvenanceState("static", "fixed-normalized"))
+        ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"))
       val accuracyState = AccuracyState("increasing", 3000, increasingStep = 1)
       val analystCase = List(1, 9)
 
@@ -213,12 +213,12 @@ object Experiment extends App {
       filename = "data/" + task + "_" + db + "_fairness.csv"
       writeReportTittle(filename)
 
-      val provenanceStates = List(ProvenanceState("static", "fixed"),
+      val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"),
         ProvenanceState("dynamic", "fixed-expansion", 1.3), ProvenanceState("dynamic", "fixed-expansion", 1.6),
         ProvenanceState("dynamic", "fixed-expansion", 1.9))
 
       val schedulers = List("round-robin", "random")
-      val mechanisms = List("aGM", "baseline", "Chorus", "ChorusP")
+      val mechanisms = List("aGM", "aGM", "aGM", "aGM")
       val accuracyState = AccuracyState("increasing", 15000, increasingStep = 2)
 
 
@@ -300,7 +300,7 @@ object Experiment extends App {
     val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
       ProvenanceState("dynamic", "fixed-normalized"), ProvenanceState("dynamic", "fixed-normalized"),
       ProvenanceState("static", "fixed-normalized"))
-    val mechanisms = List("aGM", "baseline", "Chorus", "ChorusP", "PrivateSQL")
+    val mechanisms = List("aGM", "baseline", "Chorus", "ChorusP")
     val schedulers = List("BFS")
     val eqw_params = if(db.equals("adult")) List(EQWParams(List(eqw_attr), 1, 5, 5)) else List(EQWParams(List(eqw_attr), 4000, 6000, 6))
 

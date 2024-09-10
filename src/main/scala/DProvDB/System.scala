@@ -169,7 +169,7 @@ class System {
         case "aGM" => {
           ans = synopsis.asInstanceOf[LocalSynopsis].queryAnswering(queryQuerier.query, _state.viewManager)
         }
-        case "baseline" | "PrivateSQL" => {
+        case "baseline" => {
           ans = synopsis.queryAnswering(queryQuerier.query, _state.viewManager)
         }
         case "Chorus" | "ChorusP" =>

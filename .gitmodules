@@ -1,0 +1,3 @@
+[submodule "chorus"]
+	path = chorus
+	url = https://github.com/uvm-plaid/chorus.git
