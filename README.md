@@ -45,28 +45,19 @@ This repository contains the implementation of the DProvDB system.
 
 # TL’DR
 
-  
 
 We provide automatic scripts for installing DProvDB, running it, and reproducing the experimental results presented in the paper.
 
   
 
 ```markdown
-
 # install prerequisite packages and DProvDB
-
 bash ./install.sh
 
-  
-
 # run DProvDB
-
 bash ./run.sh
 
-  
-
 # plot results
-
 bash ./plot.sh
 
 ```
@@ -83,27 +74,16 @@ If you want to manually install and run or test with your own test cases, we sug
 
 # Repository Structure
 
-  
+    ├── DProvDB/
+    │   ├── src/                              *Main directory
+    |       ├── main/scala/DProvDB/           *System source code
+    |       └── test/resources/schema.yaml    *Database configuration
+    │   ├── data/                             *Directory to dataset and place experimental results
+    |   ├── chorus/                           *Chorus submodule
+    |   ├── DProvDB_full.pdf                  *Technical report
+    |   └── build.sbt                         *Project dependency
 
-```markdown
 
-├── DProvDB/
-
-│ ├── src/ *Main directory
-
-| ├── main/scala/DProvDB/ *System source code
-
-| └── test/resources/schema.yaml *Database configuration
-
-│ ├── data/ *Directory to dataset and place experimental results (automatically)
-
-| ├── chorus/ *Chorus submodule (w. git)
-
-| ├── plot_code/ *plotting code
-
-| └── build.sbt *Project dependency
-
-```
 
   
 
@@ -160,11 +140,8 @@ The experimental results are evaluated over two datasets:
   
 
 ```markdown
-
 git clone https://github.com/DProvDB/DProvDB.git
-
 cd DProvDB
-
 ```
 
   
@@ -174,19 +151,12 @@ cd DProvDB
   
 
 ```markdown
-
 git submodule add https://github.com/uvm-plaid/chorus.git chorus
-
 git submodule update --init --recursive
 
-  
-
 cd chorus
-
 mvn install
-
 cd ..
-
 ```
 
 Note: potential missing dependencies for Chorus. If there is an error, add the following to the SBT file.
@@ -200,51 +170,28 @@ Note: potential missing dependencies for Chorus. If there is an error, add the f
   
 
 ```markdown
-
 createdb adult
-
 psql adult
 
-  
-
 CREATE TABLE adult (AGE INTEGER NOT NULL,
-
 WORKCLASS VARCHAR(55) NOT NULL,
-
 FNLWQT INTEGER NOT NULL,
-
 EDUCATION VARCHAR(55) NOT NULL,
-
 EDUCATION_NUM INTEGER NOT NULL,
-
 MARITAL_STATUS VARCHAR(55) NOT NULL,
-
 OCCUPATION VARCHAR(55) NOT NULL,
-
 RELATIONSHIP VARCHAR(55) NOT NULL,
-
 RACE VARCHAR(55) NOT NULL,
-
 SEX VARCHAR(55) NOT NULL,
-
 CAPITAL_GAIN INTEGER NOT NULL,
-
 CAPITAL_LOSS INTEGER NOT NULL,
-
 HOURS_PER_WEEK INTEGER NOT NULL,
-
 NATIVE_COUNTRY VARCHAR(55) NOT NULL,
-
 SALARY VARCHAR(55) NOT NULL);
-
-  
 
 \copy adult FROM './data/adult.data' DELIMITER ',' CSV
 
-  
-
 CREATE USER link WITH PASSWORD '12345';
-
 GRANT ALL PRIVILEGES ON TABLE adult TO link;
 
 exit;
@@ -253,8 +200,6 @@ exit;
   
 
 Note: This testing PostgreSQL is listening to the default port 5432; **If you are using another port or another username/password**, please update line 40-42 in ‘src/main/scala/Experiments/Experiments.scala’ accordingly.
-
-  
 
 One can also use their own data with DProvDB, but the DB schema needs to be properly configured in 'src/test/resources/schema.yaml'.
 
@@ -291,9 +236,7 @@ We enable four arguments:
   
 
 ```markdown
-
 sbt "run [args1] [args2] [args3] [args4]"
-
 ```
 
   
@@ -303,9 +246,7 @@ For example, to run all five experiments on the adult dataset using RRQ, use
   
 
 ```markdown
-
 sbt "run adult RRQ adult TTTTT"
-
 ```
 
   
@@ -315,43 +256,26 @@ Note: the experimental results data file is automatically stored in ‘data/’.
   
   
 
-## <a name="citation"></a>How to cite:
-
-  
+# <a name="citation"></a>How to cite: 
 
 > ```
-
 > @inproceedings{zhang2024dprovdb,
-
-> author={Zhang, Shufan and He, Xi},
-
-> title={DProvDB: Differentially Private Query Processing with Multi-Analyst Provenance},
-
-> journal={Proceedings of the ACM on Management of Data (SIGMOD'2024)},
-
-> url={https://arxiv.org/abs/2309.10240},
-
-> note={to appear}
-
+>   author={Zhang, Shufan and He, Xi},
+>   title={DProvDB: Differentially Private Query Processing with Multi-Analyst Provenance}, 
+>   journal={Proceedings of the ACM on Management of Data (SIGMOD'2024)},
+>   url={https://arxiv.org/abs/2309.10240},
+>   note={to appear}
 >}
-
 > ```
 
   
 
-## Correspondence
-
-  
+# Correspondence
 
 [:mailbox_with_mail: Shufan Zhang](mailto:shufan.zhang@uwaterloo.ca) [:scroll: Homepage](https://cs.uwaterloo.ca/~s693zhan/) <br>
-
 [:mailbox_with_mail: Xi He](mailto:xihe@uwaterloo.ca) [:scroll: Homepage](https://cs.uwaterloo.ca/~xihe/) <br>
 
-  
-  
 
 ## License
 
-  
-
-[BSD-3-Clause License](https://choosealicense.com/licenses/bsd-3-clause/
+[BSD-3-Clause License](https://choosealicense.com/licenses/bsd-3-clause/)
