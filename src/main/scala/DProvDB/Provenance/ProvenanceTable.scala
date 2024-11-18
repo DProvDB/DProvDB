@@ -37,6 +37,8 @@ class ProvenanceTable (views: List[View], analysts: List[Analyst]) {
   var _viewConstraints: Option[List[Double]] = None
   var _analystConstraints: Option[List[Double]] = None
 
+  var _deltaConstraint: Double = Double.NaN
+
   var _consumedBudget = 0
 
 
@@ -81,6 +83,10 @@ class ProvenanceTable (views: List[View], analysts: List[Analyst]) {
 
   def setTableConstraint(tableConstraint: Double): Unit = {
     _tableConstraint = Some(tableConstraint)
+  }
+
+  def setDeltaConstraint(delta: Double): Unit = {
+    _deltaConstraint = delta
   }
 
   def setViewConstraints(viewConstraints: List[Double]): Unit = {

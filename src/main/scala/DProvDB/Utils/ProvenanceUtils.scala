@@ -32,6 +32,11 @@ object ProvenanceUtils {
 
   }
 
+  def setDeltaConstraint(provT: ProvenanceTable, deltaConstraint: Double): Unit = {
+    provT._deltaConstraint = deltaConstraint
+  }
+
+
   def searchForEpsilonBinary(lower: Double, upper: Double, precision: Double, accuracyReq: Double, delta: Double,
                              querySens: Int): Double = {
 

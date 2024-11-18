@@ -29,7 +29,7 @@ object Experiment extends App {
   val db = if (args.length >= 1) args(0) else "adult"
   val task = if (args.length >= 2) args(1) else "RRQ"
   val table = if (args.length >= 3) args(2) else if (db.equals("adult")) "adult" else "orders"
-  val exps = if (args.length >= 4) args(3) else "TTTTT"
+  val exps = if (args.length >= 4) args(3) else "TTTTTT"
 
   println(db, task, table)
 
@@ -56,9 +56,10 @@ object Experiment extends App {
   val component_exp_2 = if (exps(2).==('T')) true else false
   val component_exp_3 = if (exps(3).==('T')) true else false
   val other_exp = if (exps(4).==('T')) true else false
+  val delta_exp = if (exps(5).==('T')) true else false
 
   println(s"Selected experiments: End-to-end $e2e_exp, Additive GM vs Vanilla $component_exp_1, " +
-    s"Cached Synopses $component_exp_2, Constraint Settings $component_exp_3, Other $other_exp")
+    s"Cached Synopses $component_exp_2, Constraint Settings $component_exp_3, Delta Experiment $delta_exp, Other $other_exp")
 
   val runs: Int = 4 // each experiment is run 4 times
   private val randomnessSeed = 42
@@ -279,6 +280,48 @@ object Experiment extends App {
 
     }
 
+    /**
+     * Delta Experiment: Comparisons between different delta values
+     */
+    if (delta_exp) {
+      filename = "data/" + task + "_" + db + "_end_to_end_delta.csv"
+      writeReportTittle(filename)
+
+      val state: State = new State()
+
+
+      val schedulers = List("round-robin", "random")
+
+      val mechanisms = List("aGM", "baseline", "PrivateSQL", "Chorus", "ChorusP")
+      val workloadSize = 4000
+      val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
+        ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"))
+      val accuracyState = AccuracyState("increasing", 3000, increasingStep = 1)
+      val analystCase = List(1, 9)
+
+      val overallBudgets = List(6.4)
+//      val overallBudgets = List(0.4, 0.8, 1.6, 3.2, 6.4)
+      val perQueryDeltas = List(1e-9, 1e-10, 1e-11, 1e-11, 1e-12, 1e-13)
+
+      for (curRun <- 1 to runs) {
+        overallBudgets foreach {
+          budget =>
+            perQueryDeltas foreach {
+              delta =>
+              schedulers foreach {
+                scheduler =>
+                mechanisms zip provenanceStates foreach {
+                  tuple =>
+                      setupState(state, db, table, randomnessSeed, curRun, budget, analystCase, task,
+                        workloadSize, accuracyState, tuple._2, scheduler, replacement, tuple._1, null, filename, perQueryDelta=delta)
+                      run(state)
+                }
+              }
+            }
+          }
+        }
+    }
+
   }
 
   case class EQWParams(attrs: List[String], granularity: Double, threshold: Double, m: Int)
@@ -368,7 +411,8 @@ object Experiment extends App {
   def setupState(state: State, dataset: String, tableName: String, randomnessSeed: Long, curRun: Int, budget: Double,
                  privileges: List[Int], workloadType: String, workloadSize: Int, accuracyState: AccuracyState,
                  provenanceState: ProvenanceState, scheduler: String, replacement: Boolean, mechanism: String,
-                 EQWParams: EQWParams, filename:String, accountant: String = "basic"): State = {
+                 EQWParams: EQWParams, filename:String, accountant: String = "basic", perQueryDelta: Double = 1e-9,
+                 deltaConstraint: Double = 1e-5): State = {
 
     state.setReportFile(filename)
 
@@ -379,7 +423,8 @@ object Experiment extends App {
       state.setCurRun(curRun)
     state.setupViews()
     state.setOverallBudget(budget)
-    state.setProvenanceState(provenanceState)
+    state.setProvenanceState(provenanceState)    
+    state.setDelta(perQueryDelta,deltaConstraint)
     state.setupAnalysts(privileges)
     if (task.equals("EQW"))
       state.setupEQW(workloadType, EQWParams.attrs, EQWParams.granularity, EQWParams.threshold, EQWParams.m, accuracyState)
@@ -398,7 +443,7 @@ object Experiment extends App {
 
     try {
       fw.write("dataset; mechanism; task; viewConstraintFlag; budget; utility; totalNoOfQueries; analystConstraints; setup_time; execution_time; " +
-        "utility_breakdown; DCFG; accountant; accountant_breakdown; view_breakdown; avgAccuracy; runIndex; randomness \n")
+        "utility_breakdown; DCFG; accountant; accountant_breakdown; view_breakdown; avgAccuracy; runIndex; perQueryDelta; randomness \n")
     }
     finally fw.close()
   }
@@ -427,6 +472,7 @@ object Experiment extends App {
       fw.write(view_breakdown + "; ")
       fw.write(avgAccuracy + "; ")
       fw.write(state._curRun + "; ")
+      fw.write(state._per_query_delta + "; ")
       fw.write(state._randomnessSeed + " \n")
     }
     finally fw.close()

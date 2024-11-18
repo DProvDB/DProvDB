@@ -84,6 +84,8 @@ class State {
   var _accountantMethod: String = _
 
   var _overallBudget: Double = _
+  var _per_query_delta: Double = _
+  var _delta: Double = _
 
   // analysts and queries are finalized once instantiated
   var _analysts: List[Analyst] = _
@@ -114,6 +116,11 @@ class State {
   var _workloadSize: Int = _
   var _workloadType: String = _
   var _accuracyState: AccuracyState = _
+
+  /**
+   * Flag to Test data-dependent utility
+   */
+  var _ddUtility: Boolean = _
 
   /**
    * System performance (running time)
@@ -150,6 +157,12 @@ class State {
   def setReportFile(filename: String): Unit = {
     report_filename = filename
   }
+
+  def setDelta(perQuery: Double, constraint: Double): Unit = {
+    _per_query_delta = perQuery
+    _delta = constraint
+  }
+
 
   def setLogger(logger: String): Unit = {
     _logger = logger

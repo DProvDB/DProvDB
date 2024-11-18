@@ -50,8 +50,7 @@ class ChorusWithProvenance (state: State, provTable: ProvenanceTable, compositio
    * In ChorusP, we do not have cached views.
    * In order to use the DProvDB infra, we init the provenance table but not check the column constraints.
    */
-  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double): String = {
-
+  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double, nonCachedQueries: Int): String = {
 //    var status: String = "Unknown"
 
     val cost = immediateAccountant(_accountant.getTotalCost().asInstanceOf[EpsilonDPCost].epsilon, epsilon)
@@ -68,6 +67,9 @@ class ChorusWithProvenance (state: State, provTable: ProvenanceTable, compositio
     if (rowCost > provTable._analystConstraints.getOrElse(throw new IllegalStateException(s"Analyst constraint (for analyst $analystID) does not exist!"))(analystID)) {
       return "Fail"
     }
+
+    if (nonCachedQueries * delta > provTable._deltaConstraint)
+      return "Fail"
 
     "Pass"
   }

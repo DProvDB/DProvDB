@@ -53,7 +53,7 @@ class BaselineMechanism (provTable: ProvenanceTable, compositionMethod: String =
    * "Pass": if the query can be answered, but it requires view updates or generation
    * "Fail": if any constraint is violated and the query should be rejected
    */
-  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double): String ={
+  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double, nonCachedQueries: Int): String ={
 //    var status: String = "Unknown"
     val epsilonPrev = provTable.getEntry(analystID, viewID)
 
@@ -87,6 +87,9 @@ class BaselineMechanism (provTable: ProvenanceTable, compositionMethod: String =
     if (rowCost > provTable._analystConstraints.getOrElse(throw new IllegalStateException(s"Analyst constraint (for analyst $analystID) does not exist!"))(analystID)) {
       return "Fail"
     }
+
+    if (nonCachedQueries * delta > provTable._deltaConstraint)
+      return "Fail"
 
     "Pass"
   }

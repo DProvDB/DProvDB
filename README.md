@@ -20,7 +20,6 @@
 Main repository for "DProvDB: Differentially Private Query Processing with Multi-Analyst Provenance", accepted to appear in Proc. of the ACM on Management of Data (PACMMOD/SIGMOD'2024) [[bibtex](#citation)] [[tech report](https://arxiv.org/abs/2309.10240)]
 
   
-  
 
 ## Brief Intro
 
@@ -231,7 +230,7 @@ We enable four arguments:
 
 - [args3]: table, e.g., "adult", or "orders";
 
-- [args4]: 5 letters to decide which experiment(s) to run, "T" for run, "F" for not run. e.g., "TFTFT" meaning running all experiments except the 2nd and the 4th.
+- [args4]: 6 letters to decide which experiment(s) to run, "T" for run, "F" for not run. e.g., "TFTFTT" meaning running all experiments except the 2nd and the 4th.
 
   
 
@@ -246,7 +245,7 @@ For example, to run all five experiments on the adult dataset using RRQ, use
   
 
 ```markdown
-sbt "run adult RRQ adult TTTTT"
+sbt "run adult RRQ adult TTTTTT"
 ```
 
   
@@ -270,10 +269,11 @@ Note: the experimental results data file is automatically stored in ‘data/’.
 
   
 
-# Correspondence
+# Contributors
 
 [:mailbox_with_mail: Shufan Zhang](mailto:shufan.zhang@uwaterloo.ca) [:scroll: Homepage](https://cs.uwaterloo.ca/~s693zhan/) <br>
-[:mailbox_with_mail: Xi He](mailto:xihe@uwaterloo.ca) [:scroll: Homepage](https://cs.uwaterloo.ca/~xihe/) <br>
+Xi He [:scroll: Homepage](https://cs.uwaterloo.ca/~xihe/) <br>
+Max Tang
 
 
 ## License

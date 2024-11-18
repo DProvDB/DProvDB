@@ -25,5 +25,5 @@ fi
 
 sbt "run adult EQW adult TTTTT"
 sbt "run tpch EQW orders TTTTT"
-sbt "run adult RRQ adult TTTTT"
+sbt "run adult RRQ adult TTTTTT"
 sbt "run tpch RRQ orders TTTTT"

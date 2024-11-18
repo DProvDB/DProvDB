@@ -40,9 +40,8 @@ class Chorus (provTable: ProvenanceTable, compositionMethod: String = "basic",
   }
 
 
-  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double): String = {
-
-    if (immediateAccountant(getConsumedBudget, epsilon) > _overallBudget)
+  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double, nonCachedQueries: Int): String = {
+    if (immediateAccountant(getConsumedBudget, epsilon) > _overallBudget || nonCachedQueries * delta > provTable._deltaConstraint)
       "Fail"
     else
       "Pass"

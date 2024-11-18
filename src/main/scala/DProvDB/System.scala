@@ -26,6 +26,8 @@ class System {
   var analystsAccountant: List[Double] = _
   var avgAccuracy: Double = 0
   var queryCounter: Double = 0
+  var nonCachedQueryCounter: Int = 0
+
 
   var accountantLedger: ListBuffer[Double] = new ListBuffer[Double]
   var workloadIndex: Double = 0
@@ -40,11 +42,11 @@ class System {
     setupProvenance(_state)
 
     state._mechanism match {
-      case "aGM" => _mechanism = new AdditiveGM(state, _provTable, state._analysts, state._views, compositionMethod = state._accountantMethod)
-      case "baseline" => _mechanism = new BaselineMechanism(_provTable, compositionMethod = state._accountantMethod)
-      case "Chorus" => _mechanism = new Chorus(_provTable, compositionMethod = state._accountantMethod)
-      case "ChorusP" => _mechanism = new ChorusWithProvenance(state, _provTable, compositionMethod = state._accountantMethod)
-      case "PrivateSQL" => _mechanism = new PrivateSQL(_provTable, compositionMethod = state._accountantMethod)
+      case "aGM" => _mechanism = new AdditiveGM(state, _provTable, state._analysts, state._views, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
+      case "baseline" => _mechanism = new BaselineMechanism(_provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
+      case "Chorus" => _mechanism = new Chorus(_provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
+      case "ChorusP" => _mechanism = new ChorusWithProvenance(state, _provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
+      case "PrivateSQL" => _mechanism = new PrivateSQL(_provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
       case _ => throw new IllegalArgumentException()
     }
 
@@ -75,6 +77,9 @@ class System {
       case "dynamic" =>
         ProvenanceUtils.setConstraintDynamic(_provTable, state._analysts, state._views, state._overallBudget)
     }
+        
+    ProvenanceUtils.setDeltaConstraint(_provTable, state._delta)
+
   }
 
   def execute(): Unit = {
@@ -129,7 +134,7 @@ class System {
       var synopsis: NoisyView = null
 
       if (epsilon != Double.PositiveInfinity) {
-        val status = _mechanism.checkConstraints(queryQuerier.analyst.id, view._viewID, epsilon)
+        val status = _mechanism.checkConstraints(queryQuerier.analyst.id, view._viewID, epsilon, nonCachedQueryCounter)
         if (status.equals("Pass")) {
 
           if (_state._logger.equals("full") || _state._logger.equals("debug"))
@@ -141,6 +146,7 @@ class System {
 
           avgAccuracy += queryQuerier.query._accuracyRequirement.getOrElse(0.0)
           queryCounter += 1
+          nonCachedQueryCounter += 1
         }
         else if (status.equals("Cache")) {
 

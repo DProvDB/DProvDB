@@ -121,7 +121,7 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
 
   }
 
-  def checkConstraints (analystID: Int, viewID: Int, epsilon: Double): String = {
+  def checkConstraints (analystID: Int, viewID: Int, epsilon: Double, nonCachedQueries: Int): String = {
 
     val globalSynopsis = ViewUtils.getGlobalSynopsis(_globalSynopses.toList, viewID)
 
@@ -162,6 +162,8 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
 
 //    provTable.updateEntry(analystID, viewID, diff + epsilonPrev)
 
+    if (nonCachedQueries * delta > provTable._deltaConstraint)
+      return "Fail"
 
     "Pass"
   }
