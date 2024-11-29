@@ -63,7 +63,7 @@ bash ./plot.sh
 
   
 
-Note that the experiment code can run for a while (typically 1-2 hours since it contains 4 runs for all experiments). Then, the plots for the paper can be found in the “/plot_code” directory.
+Note that the experiment code can run for a while (typically 1-2 hours since it contains 4 runs for all experiments). Then, the plots for the paper can be found in the “/plot_code” directory as in HTML files of the notebooks.
 
   
 
@@ -118,7 +118,7 @@ The experimental results are evaluated over two datasets:
 
 ## Software Requirements
 
-  
+- Anaconda for enviroment management [(Installation Guide)](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
 - Java Runtime Environment w. packaging tools MVN and SBT (**both**).
 

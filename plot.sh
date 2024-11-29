@@ -15,6 +15,13 @@ if type conda 2>/dev/null; then
       conda install -y conda-forge::maven
       conda install -y -c conda-forge postgresql
       conda install -y conda-forge::sbt
+      conda install -y conda-forge::texlive-core
+      conda install -y anaconda::pandas
+      conda install -y anaconda::numpy
+      conda install -y conda-forge::matplotlib
+      conda install -y anaconda::seaborn
+      conda install -y anaconda::ipykernel
+      conda install -y conda-forge::pandoc
     fi
 else
     echo
@@ -24,5 +31,7 @@ else
 fi
 
 cd plot_code
-jupyter nbconvert --execute --to pdf Plot_EQW.ipynb
-jupyter nbconvert --execute --to pdf Plot_conf_Ver.ipynb
+jupyter nbconvert --execute --to html Plot_EQW.ipynb
+jupyter nbconvert --execute --to html Plot_conf_Ver.ipynb
+jupyter nbconvert --execute --to html Table.ipynb
+jupyter nbconvert --execute --to html Plot-delta.ipynb
