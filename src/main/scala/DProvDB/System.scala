@@ -10,6 +10,7 @@ import edu.DProvDB.Utils.{ProvenanceUtils, ViewUtils}
 import scala.collection.mutable.ListBuffer
 import scala.language.postfixOps
 import scala.util.control.Breaks._
+import edu.DProvDB.Mechanisms.BrownianMechanism
 
 class System {
 
@@ -47,6 +48,7 @@ class System {
       case "Chorus" => _mechanism = new Chorus(_provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
       case "ChorusP" => _mechanism = new ChorusWithProvenance(state, _provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
       case "PrivateSQL" => _mechanism = new PrivateSQL(_provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
+      case "Brownian" => _mechanism = new BrownianMechanism(_provTable, compositionMethod = state._accountantMethod, delta = state._per_query_delta)
       case _ => throw new IllegalArgumentException()
     }
 
@@ -175,7 +177,7 @@ class System {
         case "aGM" => {
           ans = synopsis.asInstanceOf[LocalSynopsis].queryAnswering(queryQuerier.query, _state.viewManager)
         }
-        case "baseline" => {
+        case "baseline" | "PrivateSQL" | "Brownian" => {
           ans = synopsis.queryAnswering(queryQuerier.query, _state.viewManager)
         }
         case "Chorus" | "ChorusP" =>
