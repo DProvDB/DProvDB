@@ -1,0 +1,7 @@
+project/*
+target/*
+*.patch
+
+.metals/*
+.vscode/*
+.bsp/*

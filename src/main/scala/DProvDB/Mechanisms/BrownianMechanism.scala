@@ -78,7 +78,7 @@ class BrownianMechanism (provTable: ProvenanceTable, compositionMethod: String =
    * "Pass": if the query can be answered, but it requires view updates or generation
    * "Fail": if any constraint is violated and the query should be rejected
    */
-  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double): String ={
+  def checkConstraints(analystID: Int, viewID: Int, epsilon: Double, nonCachedQueries: Int): String ={
 //    var status: String = "Unknown"
     println(s"--BrownianMechanism: check constraints.--")
 

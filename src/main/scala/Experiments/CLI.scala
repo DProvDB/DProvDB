@@ -194,7 +194,7 @@ object CLI extends App {
         var synopsis: NoisyView = null
 
         if (epsilon != Double.PositiveInfinity) {
-            val status = _mechanism.checkConstraints(queryQuerier.analyst.id, view._viewID, epsilon)
+            val status = _mechanism.checkConstraints(queryQuerier.analyst.id, view._viewID, epsilon, 1)
             if (status.equals("Pass")) {
 
                 if (_state._logger.equals("full") || _state._logger.equals("debug"))
