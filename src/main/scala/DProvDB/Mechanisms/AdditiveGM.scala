@@ -29,9 +29,8 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
     }
   }
 
-  def run (query: Query, analyst: Analyst, view: View, epsilon: Double, status: String): LocalSynopsis = {
+  def run (query: Query, analyst: Analyst, view: View, epsilonTotal: Double, status: String): LocalSynopsis = {
 
-    println("additiveGM: run epsilon=", epsilon)
     val viewManager = new ViewManager()
 
     val globalSynopsis = ViewUtils.getGlobalSynopsis(_globalSynopses.toList, view._viewID)
@@ -45,63 +44,66 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
       case _ => throw new IllegalArgumentException()
     }
 
+    var epsilon = epsilonTotal
+    var independentNoise = false // whether a new independent noise is needed
+    if (globalSynopsis._epsilon != Double.PositiveInfinity && epsilonTotal > globalSynopsis._epsilon) {
+      epsilon = epsilonTotal - globalSynopsis._epsilon
+      independentNoise = true
+    }
+
     val sigma = AnalyticGM.calibrateAnalyticGaussianMechanism(epsilon, delta, histogramSensitivity)
+
     val newHistogram = view._flatTable map {
       cell => cell + Gaussian(0, sigma)(new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister()))).draw()
     }
 
-    // first time asking this query
-    if (globalSynopsis._epsilon == Double.PositiveInfinity) {
+    if (globalSynopsis._epsilon == Double.PositiveInfinity) { // first time asking this query
       globalSynopsis.updateEpsilon(epsilon)
       globalSynopsis.updateHistogram(newHistogram)
-      globalSynopsis._variance = sigma
+      globalSynopsis._variance = math.pow(sigma, 2)
       globalAcc = epsilon
     }
-    else {
-      if (epsilon > globalSynopsis._epsilon) {
-        globalAcc = epsilon - globalSynopsis._epsilon
-        val oldSigma = math.max(AnalyticGM.calibrateAnalyticGaussianMechanism(globalSynopsis._epsilon, delta, histogramSensitivity), math.sqrt(globalSynopsis._variance))
-        val tuple = viewManager.updateNoisyHistogram(globalSynopsis._flatTable, newHistogram, oldSigma, sigma)
-        globalSynopsis.updateEpsilon(epsilon)
-        globalSynopsis.updateHistogram(tuple._1)
-        globalSynopsis._variance = tuple._2
-      }
-    }
+    else if (independentNoise){ // asked a more accurate query, requiring new historgram
+      val oldSigma = math.max(AnalyticGM.calibrateAnalyticGaussianMechanism(globalSynopsis._epsilon, delta, histogramSensitivity), math.sqrt(globalSynopsis._variance))
+      val tuple = viewManager.updateNoisyHistogram(globalSynopsis._flatTable, newHistogram, oldSigma, sigma)
+      globalSynopsis.updateEpsilon(epsilon + globalSynopsis._epsilon)
+      globalSynopsis.updateHistogram(tuple._1)
+      globalSynopsis._variance = tuple._2
+      globalAcc = epsilon
+    } // asked a less accurate query , no need to update gloabl synopsis
 
-    // first time this analyst asking this query
-    if (localSynopsis._epsilon == Double.PositiveInfinity) {
+    var updatedLocalSynopsis = false
+    if (independentNoise) { // analyst query caused global update
+      localSynopsis.updateEpsilon(globalSynopsis._epsilon)
+      localSynopsis.updateHistogram(globalSynopsis._flatTable)
+      updatedLocalSynopsis = true
+    }
+    else if (localSynopsis._epsilon == Double.PositiveInfinity) { // first time this analyst asking this query
 
       // aGM to update local synopsis
       localSynopsis.updateEpsilon(epsilon)
       localSynopsis.updateHistogram(aGM(globalSynopsis._flatTable, histogramSensitivity, globalSynopsis._epsilon, epsilon))
-
+      updatedLocalSynopsis = true
     }
-    else {
-      if (epsilon > localSynopsis._epsilon) {
-        // first use agm to generate a new synopsis
-        val freshNoisyHistogram = aGM(view._flatTable, histogramSensitivity, globalSynopsis._epsilon, epsilon)
+    else if (epsilon > localSynopsis._epsilon) { // analyst query is more accurate than local synopsis, less accurate than global synopsis
+      // first use agm to generate a new synopsis
+      val freshNoisyHistogram = aGM(view._flatTable, histogramSensitivity, globalSynopsis._epsilon, epsilon)
 
-        // then combine with the previous one for boosting accuracy
-        localSynopsis.updateEpsilon(epsilon)
-        val oldSigma = AnalyticGM.calibrateAnalyticGaussianMechanism(localSynopsis._epsilon, delta, histogramSensitivity)
-        val tuple = viewManager.updateNoisyHistogram(localSynopsis._flatTable, freshNoisyHistogram, oldSigma, sigma)
-        localSynopsis.updateHistogram(tuple._1)
-      }
-
+      // then combine with the previous one for boosting accuracy
+      localSynopsis.updateEpsilon(epsilon) // TODO
+      val oldSigma = AnalyticGM.calibrateAnalyticGaussianMechanism(localSynopsis._epsilon, delta, histogramSensitivity)
+      val tuple = viewManager.updateNoisyHistogram(localSynopsis._flatTable, freshNoisyHistogram, oldSigma, sigma)
+      localSynopsis.updateHistogram(tuple._1)
+      updatedLocalSynopsis = true
     }
 
     if (globalAcc > 0)
       privacyAccount(globalAcc)
 
-
-    if (status.equals("Pass")) {
-      val epsilonPrev = provTable.getEntry(analyst.id, view._viewID)
-
-      // update provenance table
-      val newEps = math.min(epsilon + epsilonPrev, globalSynopsis._epsilon)
-      provTable.updateEntry(analyst.id, view._viewID, newEps)
-
-
+    if (updatedLocalSynopsis) {
+      val previousEpsilon = provTable.getEntry(analyst.id, view._viewID)
+      val nextEpsilon = math.min(localSynopsis._epsilon + previousEpsilon, globalSynopsis._epsilon)
+      provTable.updateEntry(analyst.id, view._viewID, nextEpsilon) // TODO
     }
 
     localSynopsis
@@ -126,8 +128,12 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
     val globalSynopsis = ViewUtils.getGlobalSynopsis(_globalSynopses.toList, viewID)
 
     val epsilonPrev = provTable.getEntry(analystID, viewID)
-
-    val diff = math.min(globalSynopsis._epsilon, epsilon + epsilonPrev) - epsilonPrev
+    //println(globalSynopsis._epsilon, epsilonPrev)
+    var diffView = epsilon
+    val diffAnalyst = epsilon - epsilonPrev
+    if (globalSynopsis._epsilon != Double.PositiveInfinity){
+      diffView = epsilon - globalSynopsis._epsilon
+    }
 
     println(s"--AdditiveGM: check constraints.--")
 
@@ -137,15 +143,13 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
     }
 
     // check table-level constraint
-    val cost = immediateAccountant(privacyAccountOverList(provTable.columnMax(), "colMax"), diff)
-
+    val cost = immediateAccountant(privacyAccountOverList(provTable.columnMax(), "colMax"), diffView)
     if (cost > provTable._tableConstraint.getOrElse(throw new IllegalStateException("Table constraint does not exist!"))) {
       return "Fail"
     }
 
     // get current column cost
-    val colCost = immediateAccountant(provTable.columnMax(viewID), diff)
-
+    val colCost = immediateAccountant(provTable.columnMax(viewID), diffView)
     // check column-level constraint
     if (colCost > provTable._viewConstraints.getOrElse(throw new IllegalStateException(s"View constraint (for analyst $viewID) does not exist!"))(viewID)) {
       return "Fail"
@@ -153,8 +157,7 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
 
 
     // get current row cost
-    val rowCost = immediateAccountant(privacyAccountOverList(provTable.getRow(analystID), "row"), diff)
-
+    val rowCost = immediateAccountant(privacyAccountOverList(provTable.getRow(analystID), "row"), diffAnalyst)
     // check row-level constraint
     if (rowCost > provTable._analystConstraints.getOrElse(throw new IllegalStateException(s"Analyst constraint (for analyst $analystID) does not exist!"))(analystID)) {
       return "Fail"
@@ -183,10 +186,10 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
 
     if (globalSynopsis._epsilon != Double.PositiveInfinity) {
       val variancePrev = globalSynopsis._variance
+      var accTarget = accuracyReq / bins.toDouble
 
-      println(s"--AdditiveGM privacy translation == Previous variance: $variancePrev.--")
+      println(s"--AdditiveGM privacy translation == Variance requirement: $accTarget, Previous variance: $variancePrev.--")
 
-      val accTarget = accuracyReq / bins.toDouble
       if (variancePrev <= accTarget) {
         return ProvenanceUtils.searchForEpsilonBinary(0.0, maxEpsilon, precision, accTarget, _delta, view._viewSens)
       }
@@ -194,7 +197,7 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
       // run minimizer
       val goal = GoalType.MINIMIZE
       val interval = new SearchInterval(0,1)
-      val funcToMinimize: UnivariateFunction = (x: Double) =>  - (accuracyReq - math.pow(x, 2) * variancePrev) / math.pow(1-x, 2)
+      val funcToMinimize: UnivariateFunction = (x: Double) =>  - (accTarget - math.pow(x, 2) * variancePrev) / math.pow(1-x, 2)
 
       val optimizer = new BrentOptimizer(0.01, 0.01)
       val objective = new UnivariateObjectiveFunction(funcToMinimize)
@@ -204,21 +207,34 @@ class AdditiveGM (state: State, provTable: ProvenanceTable, analysts: List[Analy
       val root = result.getPoint
 
       // target error bound
-      val varianceTarget: Double = (accuracyReq - math.pow(root, 2) * variancePrev) / math.pow(1-root, 2)
+      val varianceTarget: Double = (accTarget - math.pow(root, 2) * variancePrev) / math.pow(1-root, 2)
       sigmaTarget = math.sqrt(varianceTarget)
 
       println(s"--AdditiveGM privacy translation == varianceTarget: $varianceTarget, optimization root: ${result.getValue}.--")
+
+      accTarget = math.pow(sigmaTarget, 2) // bins.toDouble
+      println(s"--AdditiveGM: Target accuracy: $accTarget.--")
+
+      ProvenanceUtils.searchForEpsilonBinary(0.0, maxEpsilon, precision, accTarget, _delta, view._viewSens) + globalSynopsis._epsilon
     }
     else {
       // first time translation
-      sigmaTarget = math.sqrt(accuracyReq)
+      val accTarget = accuracyReq / bins.toDouble
+      println(s"--AdditiveGM: Target accuracy: $accTarget.--")
+
+      ProvenanceUtils.searchForEpsilonBinary(0.0, maxEpsilon, precision, accTarget, _delta, view._viewSens)
     }
+  }
 
-    val accTarget = math.pow(sigmaTarget, 2) / bins.toDouble
-    println(s"--AdditiveGM: Target accuracy: $accTarget.--")
+  def getGlobalSynopsis(viewID: Int): GlobalSynopsis = {
+    //println(_globalSynopses)
+    val globalSynopsis = ViewUtils.getGlobalSynopsis(_globalSynopses.toList, viewID)
+    globalSynopsis
+  }
 
-
-//    ProvenanceUtils.searchForEpsilonLine(0.0, maxEpsilon, _precision, accTarget, _delta, sens)
-    ProvenanceUtils.searchForEpsilonBinary(0.0, maxEpsilon, precision, accTarget, _delta, view._viewSens)
+  def getLocalSynopsis(viewID: Int, analystID: Int): LocalSynopsis = {
+    //println(_localSynopses)
+    val localSynopsis = ViewUtils.getLocalSynopsis(_localSynopses.toList, viewID, analystID)
+    localSynopsis
   }
 }

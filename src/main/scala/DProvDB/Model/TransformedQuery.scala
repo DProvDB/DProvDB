@@ -73,7 +73,7 @@ class TransformedQuery(query: String) {
               case expression: ComparisonExpression =>
                 // dealing with RHS
                 val RHS: ComparisonExpression = expression
-                predicates += Predicate(RHS.getLeft.toString, ComparisonOperators.withName(RHS.getType.toString), RHS.getRight.toString.substring(1, RHS.getRight.toString.length - 1))
+                predicates += Predicate(RHS.getLeft.toString, ComparisonOperators.withName(RHS.getType.toString), RHS.getRight.toString)
               case _ =>
             }
 
@@ -81,7 +81,7 @@ class TransformedQuery(query: String) {
               queryLogicalExpressions.getLeft match {
                 case expression: ComparisonExpression =>
                   val LHS: ComparisonExpression = expression
-                  predicates += Predicate(LHS.getLeft.toString, ComparisonOperators.withName(LHS.getType.toString), LHS.getRight.toString.substring(1, LHS.getRight.toString.length - 1))
+                  predicates += Predicate(LHS.getLeft.toString, ComparisonOperators.withName(LHS.getType.toString), LHS.getRight.toString)
                   break
                 case _ =>
               }

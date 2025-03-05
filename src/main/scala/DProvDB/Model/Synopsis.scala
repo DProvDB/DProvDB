@@ -31,6 +31,7 @@ class GlobalSynopsis(viewID: Int, view: View) extends Synopsis(viewID: Int, view
 
   def updateHistogram(histogram: List[Double]): Unit ={
     _flatTable = histogram
+    histogramView = (_crossedDomainSyn zip histogram)(breakOut)
   }
 }
 

@@ -63,7 +63,7 @@ object Experiment extends App {
 
   val runs: Int = 4 // each experiment is run 4 times
   private val randomnessSeed = 42
-  val replacement = false
+  private val replacement = false
 
 
   if (task == "RRQ") {
@@ -437,7 +437,7 @@ object Experiment extends App {
     state
   }
 
-  private def writeReportTittle(fileName: String): Unit = {
+ def writeReportTittle(fileName: String): Unit = {
 
     val fw = new FileWriter(fileName, true)
 
@@ -448,7 +448,7 @@ object Experiment extends App {
     finally fw.close()
   }
 
-  private def writeReportData(fileName: String, state: State, view_breakdown: String,
+  def writeReportData(fileName: String, state: State, view_breakdown: String,
                               time_sys_execute: Double, utility: Int, utility_breakdown: List[Int], DCFG: Double,
                               accountant: String, avgAccuracy:Double, accountant_breakdown: List[Double]): Unit = {
 
