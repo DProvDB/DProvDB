@@ -62,8 +62,8 @@ object Experiment extends App {
     s"Cached Synopses $component_exp_2, Constraint Settings $component_exp_3, Delta Experiment $delta_exp, Other $other_exp")
 
   val runs: Int = 4 // each experiment is run 4 times
-  private val randomnessSeed = 42
-  private val replacement = false
+  val randomnessSeed = 42
+  val replacement = false
 
 
   if (task == "RRQ") {
@@ -448,7 +448,7 @@ object Experiment extends App {
     finally fw.close()
   }
 
-  def writeReportData(fileName: String, state: State, view_breakdown: String,
+  private def writeReportData(fileName: String, state: State, view_breakdown: String,
                               time_sys_execute: Double, utility: Int, utility_breakdown: List[Int], DCFG: Double,
                               accountant: String, avgAccuracy:Double, accountant_breakdown: List[Double]): Unit = {
 
