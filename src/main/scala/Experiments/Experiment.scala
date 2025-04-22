@@ -87,10 +87,12 @@ object Experiment extends App {
 
       val schedulers = List("round-robin", "random")
 
-      val mechanisms = List("aGM", "baseline", "PrivateSQL", "Chorus", "ChorusP")
+      val mechanisms = List("Brownian", "aGM", "baseline", "PrivateSQL", "Chorus", "ChorusP")
       val workloadSize = 4000
-      val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
-        ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"))
+      val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"),
+        ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
+        ProvenanceState("static", "fixed-normalized"), ProvenanceState("static", "fixed-normalized"), 
+        ProvenanceState("static", "fixed-normalized"))
       val accuracyState = AccuracyState("increasing", 3000, increasingStep = 1)
       val analystCase = List(1, 9)
 
@@ -340,10 +342,11 @@ object Experiment extends App {
     val runs: Int = 4 // each experiment is run 4 times
 
     val accuracyState = AccuracyState("increasing", 25000, increasingStep = 100)
-    val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
+    val provenanceStates = List(ProvenanceState("dynamic", "fixed-aGM"), 
+      ProvenanceState("dynamic", "fixed-aGM"), ProvenanceState("dynamic", "fixed-normalized"),
       ProvenanceState("dynamic", "fixed-normalized"), ProvenanceState("dynamic", "fixed-normalized"),
       ProvenanceState("static", "fixed-normalized"))
-    val mechanisms = List("aGM", "baseline", "Chorus", "ChorusP")
+    val mechanisms = List("Brownian", "aGM", "baseline", "Chorus", "ChorusP")
     val schedulers = List("BFS")
     val eqw_params = if(db.equals("adult")) List(EQWParams(List(eqw_attr), 1, 5, 5)) else List(EQWParams(List(eqw_attr), 4000, 6000, 6))
 
