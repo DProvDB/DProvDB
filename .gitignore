@@ -1,0 +1,9 @@
+project/*
+target/*
+*.patch
+
+.metals/*
+.vscode/*
+.bsp/*
+
+.DS_Store
